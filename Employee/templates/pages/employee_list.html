@@ -10,48 +10,75 @@
                 <button class="btn btn-primary btn-sm ms-auto">الضبط</button>
               </div>
             </div>
-            <div class="card-body">
-              <p class="text-uppercase text-sm"> معلوامات المستخدم</p>
-              <div class="row">
-                <div class="col-md-6">
-                  <div class="form-group">
-                    <label for="example-text-input" class="form-control-label">اسم الموظف</label>
-                    <input class="form-control" type="text" value="lucky.jesse">
-                  </div>
+           <form method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
+    {% csrf_token %}
+
+    <div class="card-body">
+        <p class="text-uppercase text-sm">معلومات المستخدم</p>
+        <div class="row">
+            <!-- اسم الموظف -->
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="employee-name" class="form-control-label">اسم الموظف</label>
+                    <input id="employee-name" class="form-control" type="text" name="name" required>
+                    <small class="text-danger" id="name-error"></small>
                 </div>
-                <div class="col-md-6">
-                  <div class="form-group">
-                    <label for="example-text-input" class="form-control-label">عنوان الميل </label>
-                    <input class="form-control" type="email" value="jesse@example.com">
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="form-group">
-                    <label for="example-text-input" class="form-control-label">رقم الفون</label>
-                    <input class="form-control" type="text" value="Jesse">
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="form-group">
-                    <label for="example-text-input" class="form-control-label">رقم الفون</label>
-                    <input class="form-control" type="text" value="Jesse">
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="form-group">
-                    <label for="example-text-input" class="form-control-label">رقم الفون</label>
-                    <input class="form-control" type="text" value="Jesse">
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="form-group">
-                    <label for="example-text-input" class="form-control-label">تاريخ بدا العمل</label>
-                    <input class="form-control" type="text" value="Lucky">
-                  </div>
-                </div>
-              </div>
-              <hr class="horizontal dark">
             </div>
+
+            <!-- البريد الإلكتروني -->
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="employee-email" class="form-control-label">البريد الإلكتروني</label>
+                    <input id="employee-email" class="form-control" type="email" name="email" required>
+                    <small class="text-danger" id="email-error"></small>
+                </div>
+            </div>
+
+            <!-- رقم الهاتف -->
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="employee-phone" class="form-control-label">رقم الهاتف</label>
+                    <input id="employee-phone" class="form-control" type="text" name="phone" required>
+                    <small class="text-danger" id="phone-error"></small>
+                </div>
+            </div>
+
+            <!-- تاريخ بدء العمل -->
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="start-date" class="form-control-label">تاريخ بدء العمل</label>
+                    <input id="start-date" class="form-control" type="date" name="start_date" required>
+                </div>
+            </div>
+
+            <!-- رصيد الإجازات -->
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="vacation-balance" class="form-control-label">رصيد الإجازات (بالأيام)</label>
+                    <input id="vacation-balance" class="form-control" type="number" name="vacation_balance" value="21" min="0" required>
+                </div>
+            </div>
+
+            <!-- صورة الموظف -->
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="employee-image" class="form-control-label">صورة الموظف</label>
+                    <input id="employee-image" class="form-control" type="file" name="image" accept="image/*" required>
+                    <small class="text-danger" id="image-error"></small>
+                </div>
+            </div>
+        </div>
+
+        <hr class="horizontal dark">
+
+        <!-- Submit Button -->
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary">حفظ البيانات</button>
+        </div>
+    </div>
+</form>
+
+
           </div>
         </div>
         <div class="col-md-4">
@@ -111,4 +138,55 @@
           </div>
         </div>
       </div>
+
+
+<script>
+function validateForm() {
+    let isValid = true;
+
+    // Name Validation (Must be at least 20 chars, only letters & spaces)
+    let name = document.getElementById("employee-name").value.trim();
+    let nameRegex = /^[A-Za-z\u0600-\u06FF ]{20,}$/;  // Arabic & English letters, min 20 chars
+    if (!nameRegex.test(name)) {
+        document.getElementById("name-error").innerText = "يجب أن يكون الاسم 20 حرفًا على الأقل ولا يحتوي على رموز خاصة";
+        isValid = false;
+    } else {
+        document.getElementById("name-error").innerText = "";
+    }
+
+    // Email Validation (No special characters in local part)
+    let email = document.getElementById("employee-email").value.trim();
+    let emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(email)) {
+        document.getElementById("email-error").innerText = "يرجى إدخال بريد إلكتروني صالح";
+        isValid = false;
+    } else {
+        document.getElementById("email-error").innerText = "";
+    }
+
+    // Phone Validation (Saudi Arabia format: +966xxxxxxxxx or 05xxxxxxxx)
+    let phone = document.getElementById("employee-phone").value.trim();
+    let phoneRegex = /^(?:\+9665|05)\d{8}$/;
+    if (!phoneRegex.test(phone)) {
+        document.getElementById("phone-error").innerText = "يجب أن يكون رقم الهاتف بصيغة سعودية صحيحة (05xxxxxxxx أو +9665xxxxxxxx)";
+        isValid = false;
+    } else {
+        document.getElementById("phone-error").innerText = "";
+    }
+
+    // Image Validation (Only image files)
+    let image = document.getElementById("employee-image").files[0];
+    if (image) {
+        let allowedTypes = ["image/jpeg", "image/png", "image/gif"];
+        if (!allowedTypes.includes(image.type)) {
+            document.getElementById("image-error").innerText = "يجب أن يكون الملف صورة بصيغة JPG أو PNG أو GIF";
+            isValid = false;
+        } else {
+            document.getElementById("image-error").innerText = "";
+        }
+    }
+
+    return isValid;
+}
+</script>
 {% endblock %}

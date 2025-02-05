@@ -4,14 +4,45 @@ from django.utils.timezone import now
 from datetime import timedelta
 
 
+from django.db import models
+from django.core.validators import RegexValidator, MinLengthValidator
+from django.core.exceptions import ValidationError
+import os
+
+def validate_name(value):
+    """Ensure name is at least 20 characters and contains only letters & spaces."""
+    if not value.replace(" ", "").isalpha() or len(value) < 20:
+        raise ValidationError("يجب أن يكون الاسم 20 حرفًا على الأقل ولا يحتوي على رموز خاصة")
+
+def validate_phone(value):
+    """Ensure phone number follows Saudi Arabia format."""
+    if not value.startswith("+9665") and not value.startswith("05"):
+        raise ValidationError("رقم الهاتف يجب أن يكون بصيغة سعودية صحيحة")
+
+def validate_image(value):
+    """Ensure uploaded file is an image."""
+    ext = os.path.splitext(value.name)[1]
+    valid_extensions = ['.jpg', '.jpeg', '.png', '.gif']
+    if ext.lower() not in valid_extensions:
+        raise ValidationError("يجب أن يكون الملف صورة بصيغة JPG أو PNG أو GIF")
+
 class Employee(models.Model):
-    """ نموذج الموظف الأساسي """
-    name = models.CharField(max_length=255, verbose_name='اسم الموظف')
+    name = models.CharField(
+        max_length=255, verbose_name='اسم الموظف',
+        validators=[validate_name]
+    )
     email = models.EmailField(unique=True, verbose_name='البريد الإلكتروني')
-    phone = models.CharField(max_length=15, blank=True, null=True, verbose_name='رقم الهاتف')
+    phone = models.CharField(
+        max_length=15, verbose_name='رقم الهاتف',
+        validators=[validate_phone]
+    )
     start_date = models.DateField(verbose_name='تاريخ بدء العمل')
     vacation_balance = models.PositiveIntegerField(default=21, verbose_name='رصيد الإجازات (بالأيام)')
-    image = models.ImageField(upload_to='Employee/', verbose_name="صورة الموظف ", null=True, blank=True)
+    image = models.ImageField(
+        upload_to='Employee/', verbose_name="صورة الموظف",
+        null=True, blank=True, validators=[validate_image]
+    )
+
 
     def __str__(self):
         return self.name

@@ -8,11 +8,11 @@ app_name = 'Employee'
 
 urlpatterns = [
     # Employee URLs
-    path('employees/', EmployeeListView.as_view(), name='employee_list'),
-    path('employees/<int:pk>/', EmployeeDetailView.as_view(), name='employee_detail'),
-    path('employees/new/', EmployeeCreateView.as_view(), name='employee_create'),
-    path('employees/<int:pk>/edit/', EmployeeUpdateView.as_view(), name='employee_edit'),
-    path('employees/<int:pk>/delete/', EmployeeDeleteView.as_view(), name='employee_delete'),
+    path('', EmployeeListView.as_view(), name='employee_list'),
+    path('<int:pk>/', EmployeeDetailView.as_view(), name='employee_detail'),
+    path('new/', EmployeeCreateView.as_view(), name='employee_create'),
+    path('<int:pk>/edit/', EmployeeUpdateView.as_view(), name='employee_edit'),
+    path('<int:pk>/delete/', EmployeeDeleteView.as_view(), name='employee_delete'),
 
     # Employee Residency URLs
     path('residencies/', EmployeeResidencyListView.as_view(), name='employee_residency_list'),
