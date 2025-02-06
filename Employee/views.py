@@ -18,6 +18,7 @@ class EmployeeDetailView(DetailView):
     template_name = 'employee_detail.html'
     context_object_name = 'employee'
 
+
 # إنشاء موظف جديد
 class EmployeeCreateView(FormView):
     template_name = 'employee_form.html'  # New template for both forms
@@ -44,6 +45,7 @@ class EmployeeCreateView(FormView):
         """If Employee form is invalid, show errors and keep the form visible"""
         messages.error(self.request, "⚠️ يوجد خطأ في البيانات، يرجى التحقق من المدخلات.")
         return self.render_to_response(self.get_context_data(form=form))
+
 
 # تعديل بيانات الموظف
 class EmployeeUpdateView(UpdateView):

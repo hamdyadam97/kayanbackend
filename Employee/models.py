@@ -26,6 +26,7 @@ def validate_image(value):
     if ext.lower() not in valid_extensions:
         raise ValidationError("يجب أن يكون الملف صورة بصيغة JPG أو PNG أو GIF")
 
+
 class Employee(models.Model):
     name = models.CharField(
         max_length=255, verbose_name='اسم الموظف',
