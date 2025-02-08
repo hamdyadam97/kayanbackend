@@ -43,8 +43,37 @@ class EmployeeForm(forms.ModelForm):
         return image
 
 
+class EmployeeResidencyForm(forms.ModelForm):
+    class Meta:
+        model = EmployeeResidency
+        fields = ['employee', 'issue_date', 'expiry_date', 'residency_file']
 
 class EmployeeResidencyForm(forms.ModelForm):
     class Meta:
         model = EmployeeResidency
         fields = ['employee', 'issue_date', 'expiry_date', 'residency_file']
+
+    # Ensure expiry_date is after issue_date
+    def clean_expiry_date(self):
+        issue_date = self.cleaned_data.get("issue_date")
+        expiry_date = self.cleaned_data.get("expiry_date")
+
+        if expiry_date and issue_date and expiry_date <= issue_date:
+            raise forms.ValidationError("يجب أن يكون تاريخ انتهاء الإقامة بعد تاريخ الإصدار.")
+
+        return expiry_date
+
+    # Validate uploaded residency file
+    def clean_residency_file(self):
+        file = self.cleaned_data.get("residency_file")
+        if file:
+            allowed_types = ["application/pdf", "image/jpeg", "image/png"]
+            max_size = 5 * 1024 * 1024  # 5MB limit
+
+            if file.content_type not in allowed_types:
+                raise forms.ValidationError("يجب أن يكون الملف بصيغة PDF أو صورة (JPEG/PNG).")
+
+            if file.size > max_size:
+                raise forms.ValidationError("يجب ألا يتجاوز حجم الملف 5 ميجابايت.")
+
+        return file

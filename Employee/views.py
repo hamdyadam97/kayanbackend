@@ -54,6 +54,7 @@ class EmployeeUpdateView(UpdateView):
     fields = ['name', 'email', 'phone', 'start_date', 'vacation_balance']
     success_url = reverse_lazy('employee_list')
 
+
 # حذف موظف
 class EmployeeDeleteView(DeleteView):
     model = Employee
@@ -67,24 +68,27 @@ class EmployeeResidencyListView(ListView):
     template_name = 'employee_residency_list.html'
     context_object_name = 'residencies'
 
+
 # عرض تفاصيل إقامة الموظف
 class EmployeeResidencyDetailView(DetailView):
     model = EmployeeResidency
     template_name = 'employee_residency_detail.html'
     context_object_name = 'residency'
 
+
 # إنشاء إقامة جديدة
 class EmployeeResidencyCreateView(CreateView):
+    """Create a new residency"""
     model = EmployeeResidency
-    template_name = 'employee_residency_form.html'
-    fields = ['employee', 'issue_date', 'expiry_date', 'residency_file']
-    success_url = reverse_lazy('employee_residency_list')
+    form_class = EmployeeResidencyForm
+    template_name = "residency_form.html"
+    success_url = reverse_lazy("employee_residency_list")
 
 
 # تعديل بيانات الإقامة
 class EmployeeResidencyUpdateView(UpdateView):
     model = EmployeeResidency
-    template_name = 'employee_residency_form.html'
+    template_name = 'residency_form.html'
     fields = ['issue_date', 'expiry_date', 'residency_file']
     success_url = reverse_lazy('employee_residency_list')
 
