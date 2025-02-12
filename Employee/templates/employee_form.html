@@ -114,87 +114,58 @@
 <!-- Residency Form (Only shown after Employee is created) -->
 {% if employee_created %}
     <h3>إضافة إقامة الموظف</h3>
-    <form method="POST">
-        {% csrf_token %}
-        {{ residency_form.as_p }}
+       <form method="POST" enctype="multipart/form-data" action="{% url 'Employee:submit_residency' %}">
+    {% csrf_token %}
+    <div class="card-body">
+        <p class="text-uppercase text-sm">معلومات الإقامة</p>
 
-        <form method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
-                {% csrf_token %}
+        <div class="row">
+            <!-- الموظف -->
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="employee" class="form-control-label">الموظف</label>
+                    <select id="employee" class="form-control" name="employee" required>
+                        <!-- سيتم ملء الخيارات من قاعدة البيانات -->
 
-                <div class="card-body">
-                    <p class="text-uppercase text-sm">معلومات المستخدم</p>
-                    <div class="row">
-                        <!-- اسم الموظف -->
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="employee-name" class="form-control-label">اسم الموظف</label>
-                                <input id="employee-name" class="form-control" type="text" name="name" required>
-                                <small class="text-danger" id="name-error"></small>
-                            </div>
-                        </div>
-
-                        <!-- البريد الإلكتروني -->
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="employee-email" class="form-control-label">البريد الإلكتروني</label>
-                                <input id="employee-email" class="form-control" type="email" name="email" required>
-                                <small class="text-danger" id="email-error"></small>
-                            </div>
-                        </div>
-
-                        <!-- رقم الهاتف -->
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="employee-phone" class="form-control-label">رقم الهاتف</label>
-                                <input id="employee-phone" class="form-control" type="text" name="phone" required>
-                                <small class="text-danger" id="phone-error"></small>
-                            </div>
-                        </div>
-
-                        <!-- تاريخ بدء العمل -->
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="start-date" class="form-control-label">تاريخ بدء العمل</label>
-                                <input id="start-date" class="form-control" type="date" name="start_date" required>
-                            </div>
-                        </div>
-
-                        <!-- رصيد الإجازات -->
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="vacation-balance" class="form-control-label">رصيد الإجازات (بالأيام)</label>
-                                <input id="vacation-balance" class="form-control" type="number" name="vacation_balance"
-                                       value="21" min="0" required>
-                            </div>
-                        </div>
-
-                        <!-- صورة الموظف -->
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="employee-image" class="form-control-label">صورة الموظف</label>
-                                <input id="employee-image" class="form-control" type="file" name="image"
-                                       accept="image/*" required>
-                                <small class="text-danger" id="image-error"></small>
-                            </div>
-                        </div>
-                    </div>
-                    <hr class="horizontal dark">
-                    {% for field in form %}
-                    <div class="form-group">
-
-                        {% if field.errors %}
-                        <small class="text-danger">{{ field.errors.as_text }}</small>
-                        {% endif %}
-                    </div>
-                    {% endfor %}
-                    <!-- Submit Button -->
-                    <div class="text-center">
-                        <button type="submit" class="btn btn-primary">حفظ البيانات</button>
-                    </div>
+                        <option value="{{ employee_id }}">{{ employee_name }}</option>
+                    </select>
                 </div>
-            </form>
-        <button type="submit" class="btn btn-success">حفظ الإقامة</button>
-    </form>
+            </div>
+
+            <!-- تاريخ الإصدار -->
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="issue-date" class="form-control-label">تاريخ الإصدار</label>
+                    <input id="issue-date" class="form-control" type="date" name="issue_date" required>
+                </div>
+            </div>
+
+            <!-- تاريخ الانتهاء -->
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="expiry-date" class="form-control-label">تاريخ الانتهاء</label>
+                    <input id="expiry-date" class="form-control" type="date" name="expiry_date" required>
+                </div>
+            </div>
+
+            <!-- ملف الإقامة -->
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="residency-file" class="form-control-label">ملف الإقامة</label>
+                    <input id="residency-file" class="form-control" type="file" name="residency_file" accept=".pdf, .jpg, .png" required>
+                    <small class="text-muted">يجب أن يكون الملف بصيغة PDF أو صورة (JPEG/PNG).</small>
+                </div>
+            </div>
+        </div>
+
+        <hr class="horizontal dark">
+
+        <!-- زر الحفظ -->
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary">حفظ البيانات</button>
+        </div>
+    </div>
+</form>
 {% endif %}
 
         </div>
