@@ -1,9 +1,10 @@
-from Employee.models import Employee
+from django.utils.translation import gettext_lazy as _
+from django.http import JsonResponse
+from django.utils.translation import activate
 
 
-def get_employee_by_id(employee_id):
-    employees = Employee.objects.filter(id=employee_id)  # Use filter to get a queryset
-    if employees.exists():  # Check if the queryset contains any employees
-        return employees.first()  # Return the first (and only) employee
-    return None
+def change_language(request, lang_code):
+    activate(lang_code)  # Set the language dynamically
+    return JsonResponse({"message": _("Hello, world!")})
+
 

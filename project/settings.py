@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 import os
 from pathlib import Path
-
+from django.utils.translation import gettext_lazy as _
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -37,12 +37,29 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'Employee'
+    'drf_yasg',
+    'rest_framework',
+    'Employee',
+]
+
+LANGUAGE_CODE = "ar-eg"
+USE_I18N = True
+USE_L10N = True
+USE_TZ = True
+LANGUAGES = [
+    ("en", _("English")),
+    ("ar", _("Arabic")),
+    ("fr", _("French")),
+
+]
+LOCALE_PATHS = [
+    os.path.join(BASE_DIR, 'locale'),
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    "django.middleware.locale.LocaleMiddleware",  # add here
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -136,3 +153,10 @@ MEDIA_URL = '/media/'  # لتحديد الرابط الذي سيتم من خلا
 MEDIA_ROOT = BASE_DIR / 'media'  # لتحديد المكان الذي سيتم تخزين الملفات فيه
 
 
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': [
+        'project.renderer.CustomJSONRenderer',  # Update with the correct path
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,  # Adjust the page size as needed
+}
