@@ -34,16 +34,16 @@ class EmployeeDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     """
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
-
+    lookup_field = 'slug'  # Tells DRF to use the slug field for lookups
     def retrieve(self, request, *args, **kwargs):
         """Override GET response format"""
-        employee = get_object_or_404(Employee, pk=kwargs["pk"])
+        employee = get_object_or_404(Employee, pk=kwargs["slug"])
         serializer = self.get_serializer(employee)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def update(self, request, *args, **kwargs):
         """Override PUT/PATCH response format"""
-        employee = get_object_or_404(Employee, pk=kwargs["pk"])
+        employee = get_object_or_404(Employee, pk=kwargs["slug"])
         serializer = self.get_serializer(employee, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
@@ -52,7 +52,7 @@ class EmployeeDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
 
     def destroy(self, request, *args, **kwargs):
         """Override DELETE response format"""
-        employee = get_object_or_404(Employee, pk=kwargs["pk"])
+        employee = get_object_or_404(Employee, pk=kwargs["slug"])
         employee.delete()
         return Response({"message": "Employee deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
 

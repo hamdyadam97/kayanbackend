@@ -27,6 +27,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -35,10 +37,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'corsheaders',
     'drf_yasg',
     'rest_framework',
     'Employee',
+    'corsheaders',
 ]
 
 LANGUAGE_CODE = "ar-eg"
@@ -55,17 +57,23 @@ LOCALE_PATHS = [
     os.path.join(BASE_DIR, 'locale'),
 ]
 
+
+
 MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware",  # very first
+    "corsheaders.middleware.CorsMiddleware",  # Must come first
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    "django.middleware.locale.LocaleMiddleware",  # add here
     'django.middleware.common.CommonMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+
+
+
 
 ROOT_URLCONF = 'project.urls'
 
@@ -162,13 +170,3 @@ REST_FRAMEWORK = {
 
 
 
-
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-]
-
-
-CORS_ALLOW_ALL_ORIGINS = True
-
-
-CORS_ALLOW_CREDENTIALS = True
