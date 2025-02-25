@@ -20,6 +20,7 @@ class EmployeeListCreateAPIView(generics.ListCreateAPIView):
     def create(self, request, *args, **kwargs):
         """Override POST response format"""
         serializer = self.get_serializer(data=request.data)
+        print(request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -35,15 +36,15 @@ class EmployeeDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
     lookup_field = 'slug'  # Tells DRF to use the slug field for lookups
+
+    # If you wish to override methods, for example, retrieve:
     def retrieve(self, request, *args, **kwargs):
-        """Override GET response format"""
-        employee = get_object_or_404(Employee, pk=kwargs["slug"])
+        employee = get_object_or_404(Employee, slug=kwargs["slug"])
         serializer = self.get_serializer(employee)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def update(self, request, *args, **kwargs):
-        """Override PUT/PATCH response format"""
-        employee = get_object_or_404(Employee, pk=kwargs["slug"])
+        employee = get_object_or_404(Employee, slug=kwargs["slug"])
         serializer = self.get_serializer(employee, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
@@ -51,8 +52,6 @@ class EmployeeDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, *args, **kwargs):
-        """Override DELETE response format"""
-        employee = get_object_or_404(Employee, pk=kwargs["slug"])
+        employee = get_object_or_404(Employee, slug=kwargs["slug"])
         employee.delete()
         return Response({"message": "Employee deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
-

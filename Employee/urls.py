@@ -6,6 +6,6 @@ app_name = 'Employee'
 
 urlpatterns = [
     path('', EmployeeListCreateAPIView.as_view(), name='employee-list-create'),
-    path('employees/<slug:slug>/', EmployeeDetailAPIView.as_view(), name='employee-detail'),
+    path('<slug:slug>/', EmployeeDetailAPIView.as_view(), name='employee-detail'),
 ]
 
