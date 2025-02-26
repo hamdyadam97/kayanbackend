@@ -53,5 +53,6 @@ class EmployeeDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
 
     def destroy(self, request, *args, **kwargs):
         employee = get_object_or_404(Employee, slug=kwargs["slug"])
+        print(employee)
         employee.delete()
-        return Response({"message": "Employee deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+        return Response({"message": "Employee deleted successfully"}, status=status.HTTP_200_OK)
