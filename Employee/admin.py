@@ -1,9 +1,4 @@
-from django.contrib import admin
-from Employee.models import Employee
-
-# Register your models here.
-
-
+from Employee.models import Employee, Residence
 from django.contrib import admin
 from .models import Employee
 
@@ -16,5 +11,15 @@ class EmployeeAdmin(admin.ModelAdmin):
         # Use the all_objects manager so that all records are returned.
         return qs.model.all_objects.all()
 
-admin.site.register(Employee, EmployeeAdmin)
 
+
+class ResidenceAdmin(admin.ModelAdmin):
+    list_display = ['employee', 'duration', 'start_date', 'end_date', 'is_deleted']
+    list_filter = ['is_deleted', 'duration']
+
+    def get_queryset(self, request):
+        return Residence.all_objects.all()
+
+
+admin.site.register(Employee, EmployeeAdmin)
+admin.site.register(Residence, ResidenceAdmin)

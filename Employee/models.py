@@ -1,7 +1,9 @@
+import calendar
+from datetime import date
 from django.db import models
-from django.utils.text import slugify
 from django.utils import timezone
-
+from django.core.exceptions import ValidationError
+from django.utils.text import slugify
 from Employee.utils import generate_unique_slug
 
 
@@ -46,6 +48,9 @@ def passport_image_upload(instance, filename):
     """رفع صورة جواز السفر"""
     return f'employee_passports/{instance.id}/{filename}'
 
+def residence_image_upload(instance, filename):
+    """رفع صورة  الاقامة"""
+    return f'Residence_img/{instance.id}/{filename}'
 
 def national_id_image_upload(instance, filename):
     """رفع صورة الهوية الوطنية"""
@@ -161,39 +166,65 @@ class Employee(models.Model):
         verbose_name_plural = "الموظفون"
         ordering = ['name']
 
-
-
-
+# Optional custom manager: only returns non-deleted residences
+class ResidenceManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_deleted=False)
 
 class Residence(models.Model):
     """
     نموذج إقامة الموظف.
     كل موظف يمكن أن يكون له إقامة واحدة نشطة في وقت واحد.
     """
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='residences', verbose_name="الموظف")
+    employee = models.ForeignKey('Employee', on_delete=models.CASCADE, related_name='residences', verbose_name="الموظف")
+    # This slug is generated from the employee's slug (or name if slug not set) and made unique.
+    slug = models.SlugField(unique=True, blank=True, null=True, verbose_name="Slug الإقامة")
     duration = models.CharField(max_length=3, choices=DURATION_CHOICES, verbose_name="مدة الإقامة")
-    start_date = models.DateField(default=timezone.now, verbose_name="تاريخ بدء الإقامة")
+    start_date = models.DateField(default=get_today_date, verbose_name="تاريخ بدء الإقامة")
     end_date = models.DateField(blank=True, null=True, verbose_name="تاريخ انتهاء الإقامة")
+    # Soft delete fields:
+    is_deleted = models.BooleanField(default=False, verbose_name="محذوف؟")
+    deleted_at = models.DateTimeField(null=True, blank=True, verbose_name="تاريخ الحذف")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="تاريخ الإنشاء")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="آخر تحديث")
+    Residence_image = models.ImageField(upload_to=residence_image_upload, blank=True, null=True,
+                                       verbose_name="صورة جواز السفر")
+    # Set default manager to return only non-deleted residences
+    objects = ResidenceManager()
+    # all_objects returns everything (including soft-deleted)
+    all_objects = models.Manager()
 
     def clean(self):
-        """
-        Ensure that there is no active residence for this employee.
-        An active residence is one whose end_date is greater than or equal to today.
-        """
-        active_residences = Residence.objects.filter(employee=self.employee, end_date__gte=timezone.now().date())
+        """Ensure no active residence exists for this employee."""
+        active_residences = Residence.all_objects.filter(employee=self.employee, is_deleted=False,
+                                                         end_date__gte=timezone.now().date())
+        print(active_residences,self.employee)
         if self.pk:
             active_residences = active_residences.exclude(pk=self.pk)
         if active_residences.exists():
             raise ValidationError("يوجد إقامة سارية للموظف. يجب انتهاء الإقامة الحالية قبل إنشاء إقامة جديدة.")
 
     def save(self, *args, **kwargs):
-        # Automatically calculate the end_date if not provided
+        # Auto-calculate end_date if not provided
         if not self.end_date:
             self.end_date = calculate_end_date(self.start_date, self.duration)
-        self.full_clean()  # This will call clean() and raise errors if any.
+        # Generate a unique slug if not provided.
+        if not self.slug and self.employee:
+            base_slug = slugify(self.employee.slug) if self.employee.slug else slugify(self.employee.name)
+            unique_slug = base_slug
+            num = 1
+            while Residence.all_objects.filter(slug=unique_slug).exists():
+                unique_slug = f"{base_slug}-{num}"
+                num += 1
+            self.slug = unique_slug
+
         super().save(*args, **kwargs)
+
+    def delete(self, using=None, keep_parents=False):
+        """Soft delete: mark the residence as deleted."""
+        self.is_deleted = True
+        self.deleted_at = timezone.now()
+        self.save()
 
     def __str__(self):
         return f"إقامة {self.employee.name} من {self.start_date} إلى {self.end_date}"
